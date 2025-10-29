@@ -71,7 +71,7 @@ version = "0.0.1"
 requires-python = ">=3.10,<3.13"
 dependencies = [
     "typer",
-    "fastmcp==2.0.0",
+    "fastmcp==2.13.0",
     "pydantic>=2.0.0,<3.0.0",
 ]
 readme = "README.md"
