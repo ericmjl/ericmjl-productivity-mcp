@@ -107,6 +107,50 @@ def git_branch_and_stage() -> str:
 Important: Do NOT commit the changes - only stage them. The user will commit when ready."""
 
 
+@mcp.prompt()
+def debug_github_actions(workflow_url: str) -> str:
+    """Debug GitHub Actions workflow failures by analyzing logs and providing actionable solutions."""
+    return f"""You are helping me debug a failed GitHub Actions workflow. Follow these steps to systematically analyze and resolve the issue:
+
+1. **Extract workflow information**: Parse the provided URL to identify:
+   - Repository owner and name
+   - Workflow run ID
+   - Workflow name
+   - Branch/commit that triggered the run
+
+2. **Fetch workflow logs using GitHub CLI**:
+   - Use `gh run list` to verify the workflow run exists
+   - Use `gh run view <run-id>` to get detailed run information
+   - Use `gh run view <run-id> --log` to download and display the full logs
+   - Use `gh run view <run-id> --log-failed` to focus on failed job logs
+
+3. **Analyze the failure**:
+   - Identify which job(s) failed and at what step
+   - Look for error messages, exit codes, and stack traces
+   - Check for common issues: dependency problems, permission errors, timeout issues, resource constraints
+   - Examine the workflow configuration and environment setup
+
+4. **Provide debugging guidance**:
+   - Explain what went wrong in simple terms
+   - Suggest specific fixes or configuration changes
+   - Provide commands or code snippets to resolve the issue
+   - Recommend preventive measures to avoid similar failures
+
+5. **Context-aware solutions**:
+   - Consider the project type (Python, Node.js, etc.) and suggest appropriate fixes
+   - Check for recent changes that might have caused the failure
+   - Suggest workflow improvements or optimizations
+
+6. **Follow-up actions**:
+   - Recommend next steps for testing the fix
+   - Suggest monitoring or alerting improvements
+   - Provide guidance on preventing similar issues
+
+Workflow URL: {workflow_url}
+
+Focus on providing actionable, specific solutions rather than generic troubleshooting advice. Use the GitHub CLI commands to gather comprehensive information about the failure."""
+
+
 # Resources
 @mcp.resource("resource://productivity_methods")
 def productivity_methods() -> str:
