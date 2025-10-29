@@ -25,28 +25,35 @@ Provide a prioritized order with reasoning for each task."""
 
 
 @mcp.prompt()
-def focus_session(duration_minutes: str = "90") -> str:
-    """Create an optimal focus session with environmental optimizations and break timing."""
-    return f"""Help me create an optimal focus session by:
-1. Identifying my most important task for the next {duration_minutes} minutes
-2. Suggesting environmental optimizations (noise, lighting, tools)
-3. Recommending break timing and activities
-4. Providing motivation and accountability check-ins
+def log_progress() -> str:
+    """Document current progress and create a comprehensive work log for future reference."""
+    return """You are helping me create a comprehensive work log to capture all progress made during our current session. Follow these steps:
 
-Focus on deep work principles and minimizing distractions."""
+1. **Review our conversation**: Analyze everything we've accomplished, including:
+   - Code changes and implementations
+   - Problem-solving approaches taken
+   - Decisions made and their rationale
+   - Challenges encountered and how they were resolved
+   - Key learnings and insights gained
 
+2. **Create or update WORKLOG.md**:
+   - Read the existing WORKLOG.md file (create it if it doesn't exist)
+   - Add a new timestamped entry with today's date
+   - Structure the entry with clear sections for easy future reference
 
-@mcp.prompt()
-def daily_reflection(completed_tasks: str = "my completed tasks") -> str:
-    """Guide through end-of-day productivity reflection and planning."""
-    return f"""Guide me through a productive daily reflection by asking about:
-1. What went well today and why
-2. What challenges I faced and how I handled them
-3. What I learned about my productivity patterns
-4. What I want to improve tomorrow
-5. Gratitude and wins to celebrate
+3. **Document structure should include**:
+   - **Date & Session Summary**: Brief overview of what was accomplished
+   - **Code Changes**: Specific files modified, functions added/changed, architectural decisions
+   - **Problem Solving**: Issues encountered, debugging steps, solutions implemented
+   - **Key Learnings**: Important insights, patterns discovered, best practices identified
+   - **Next Steps**: Clear action items and priorities for future sessions
+   - **Context Notes**: Any important context that would help pick up where we left off
 
-Help me extract insights and plan for better tomorrow based on: {completed_tasks}"""
+4. **Focus on actionable continuity**: Write entries that will help you (or another AI) quickly understand the current state and continue work effectively.
+
+5. **Confirm completion**: Tell me what you documented and highlight the key points for future reference.
+
+This work log serves as a bridge between sessions, ensuring no progress is lost and context is preserved for seamless continuation."""
 
 
 @mcp.prompt()
