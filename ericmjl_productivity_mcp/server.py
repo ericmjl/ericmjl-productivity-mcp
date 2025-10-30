@@ -151,6 +151,50 @@ Workflow URL: {workflow_url}
 Focus on providing actionable, specific solutions rather than generic troubleshooting advice. Use the GitHub CLI commands to gather comprehensive information about the failure."""
 
 
+@mcp.prompt()
+def devdigest(timeframe: str = "last week") -> str:
+    """Generate a comprehensive development digest using GitHub CLI to summarize commits, issues, PRs, and activity."""
+    return f"""You are helping me create a comprehensive development digest that summarizes my GitHub activity and accomplishments. Follow these steps to gather and analyze my development work:
+
+1. **Gather GitHub Activity Data** using the GitHub CLI:
+   - **Commits**: Use `gh api /user/events` to get recent activity, or `gh log --oneline --since="{timeframe}"` for commit history
+   - **Pull Requests**: Use `gh pr list --author=@me --state=all --limit=20` to get recent PRs
+   - **Issues**: Use `gh issue list --author=@me --state=all --limit=20` to get issues I've created or commented on
+   - **Comments**: Use `gh api /user/issues/comments` and `gh api /user/pulls/comments` for recent comments
+   - **Repositories**: Use `gh repo list --limit=10` to see recent repository activity
+   - **Stars/Activity**: Use `gh api /user/starred` for recently starred repositories
+
+2. **Analyze the Data** and identify:
+   - **Code Contributions**: Commits made, lines added/removed, files changed
+   - **Pull Request Activity**: PRs created, reviewed, merged, or closed
+   - **Issue Management**: Issues created, resolved, or participated in
+   - **Repository Work**: New repos created, existing repos updated
+   - **Community Engagement**: Comments, reviews, discussions participated in
+   - **Learning & Discovery**: Repositories starred, new technologies explored
+
+3. **Create a Structured Dev Log** with these sections:
+   - **📊 Summary Stats**: Total commits, PRs, issues, repositories worked on
+   - **🚀 Major Accomplishments**: Significant features, bug fixes, or improvements
+   - **🔧 Technical Work**: Code refactoring, architecture changes, tooling improvements
+   - **🤝 Collaboration**: PR reviews, issue discussions, community contributions
+   - **📚 Learning & Growth**: New technologies, patterns, or skills demonstrated
+   - **🎯 Project Highlights**: Notable projects or repositories with significant activity
+   - **📈 Productivity Insights**: Patterns in work habits, peak activity times, project focus areas
+
+4. **Format the Output** as a markdown document that:
+   - Uses clear headings and bullet points
+   - Includes specific metrics and numbers where possible
+   - Highlights the most impactful work
+   - Shows progression and growth over time
+   - Provides context for why certain work was important
+
+5. **Timeframe Context**: Focus on activity from {timeframe}, but also note any longer-term trends or patterns.
+
+6. **Save the Digest**: Create or update a file called `DEV_DIGEST.md` with the comprehensive summary.
+
+The goal is to create a professional, insightful summary that showcases development productivity, technical growth, and meaningful contributions to projects and the community. Use the GitHub CLI to gather as much relevant data as possible, then synthesize it into a compelling narrative of development accomplishments."""
+
+
 # Resources
 @mcp.resource("resource://productivity_methods")
 def productivity_methods() -> str:
