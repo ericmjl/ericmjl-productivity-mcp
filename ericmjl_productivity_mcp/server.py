@@ -79,7 +79,7 @@ def remember() -> str:
 3. **Update AGENTS.md**:
    - Read the existing AGENTS.md file (create it if it doesn't exist)
    - Add a timestamped entry to the appropriate section
-   - Use this format: `- [YYYY-MM-DD HH:MM] Description of what was learned`
+   - Use this format: `- Description of what was learned`
    - If a section doesn't exist, create it with a proper markdown header
 
 4. **Confirm what you remembered**: Tell me what you added to AGENTS.md and which section you placed it in.
