@@ -88,6 +88,59 @@ Focus on capturing actionable insights that will help future AI agents understan
 
 
 @mcp.prompt()
+def add_markdownlint_rules() -> str:
+    """Add markdownlint rules to AGENTS.md for consistent markdown formatting."""
+    return """You are tasked with adding markdownlint rules to AGENTS.md to ensure
+consistent markdown formatting across the project. Follow these steps:
+
+1. **Read AGENTS.md**: Read the existing AGENTS.md file (create it if it doesn't
+   exist).
+
+2. **Find or create the Development Workflow section**: Look for a "Development
+   Workflow" section. If it doesn't exist, create it with a proper markdown
+   header (## Development Workflow).
+
+3. **Add the markdownlint rules**: Add the following markdownlint rules:
+
+   - **Markdownlint Rules**: Always run markdownlint on any
+     markdown files that are edited or created. This ensures consistent
+     formatting and catches common markdown issues. The workflow is:
+     1. After editing any markdown file (`.md`), run `markdownlint <file-path>`
+        to check for issues.
+     2. If markdownlint is not found on PATH, install it using
+        `pixi global install markdownlint-cli`. This installs it globally via
+        pixi and makes it available on PATH.
+     3. Always fix any issues that markdownlint raises before considering the
+        task complete. Common issues include: trailing whitespace, missing
+        blank lines around headers, improper list formatting, and line length
+        violations.
+     4. For multiple files, you can run `markdownlint "**/*.md"` to check all
+        markdown files in the project, or specify individual files.
+     5. If markdownlint reports errors, fix them immediately and re-run
+        markdownlint to verify the fixes.
+
+4. **Run markdownlint on AGENTS.md**: After adding the rules, run
+   `markdownlint AGENTS.md` to check for any formatting issues. If
+   markdownlint is not available, install it first using
+   `pixi global install markdownlint-cli`.
+
+5. **Fix any issues**: If markdownlint reports any errors, fix them
+   immediately. Common fixes include:
+   - Breaking long lines (keep lines under 80 characters)
+   - Adding blank lines around headers
+   - Fixing list formatting
+   - Removing trailing whitespace
+
+6. **Verify**: Re-run markdownlint to ensure all issues are resolved.
+
+7. **Confirm completion**: Tell me that you've added the markdownlint rules to
+   AGENTS.md and verified that the file passes markdownlint checks.
+
+This ensures that all future markdown files in the project will be consistently
+formatted and checked for quality."""
+
+
+@mcp.prompt()
 def git_branch_and_stage() -> str:
     """Create a new branch and stage all changes based on a diff."""
     return """You are helping the user create a new git branch and stage their changes. Follow these steps:
