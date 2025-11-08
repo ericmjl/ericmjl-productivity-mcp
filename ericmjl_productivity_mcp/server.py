@@ -88,6 +88,36 @@ Focus on capturing actionable insights that will help future AI agents understan
 
 
 @mcp.prompt()
+def correction(thing: str, different_thing: str) -> str:
+    """Record a correction in AGENTS.md and then continue with the corrected approach."""
+    return f"""You have been corrected. Follow these steps:
+
+1. **Understand the correction**:
+   - You were about to do or were doing: {thing}
+   - Instead, you should do: {different_thing}
+
+2. **Record the correction in AGENTS.md**:
+   - Read the existing AGENTS.md file (create it if it doesn't exist)
+   - Find or create a "Corrections" section (or add to "User Preferences" if more appropriate)
+   - Add a timestamped entry documenting this correction:
+     - Format: `- Do not {thing}. Instead, {different_thing}.`
+   - This helps future AI agents avoid the same mistake
+
+3. **Apply the correction immediately**:
+   - Stop doing or planning to do: {thing}
+   - Start doing or planning to do: {different_thing}
+
+4. **Continue your work**:
+   - After recording the correction, immediately continue with the corrected approach
+   - Do not ask for confirmation - just proceed with {different_thing}
+   - Maintain context and continue from where you left off
+
+5. **Confirm briefly**: Tell me you've recorded the correction and are continuing with the corrected approach.
+
+The goal is to quickly course-correct, document the learning, and seamlessly continue with the right approach."""
+
+
+@mcp.prompt()
 def add_markdownlint_rules() -> str:
     """Add markdownlint rules to AGENTS.md for consistent markdown formatting."""
     return """You are tasked with adding markdownlint rules to AGENTS.md to ensure
