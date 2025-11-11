@@ -278,6 +278,136 @@ def devdigest(timeframe: str = "last week") -> str:
 The goal is to create a professional, insightful summary that showcases development productivity, technical growth, and meaningful contributions to projects and the community. Use the GitHub CLI to gather as much relevant data as possible, then synthesize it into a compelling narrative of development accomplishments."""
 
 
+@mcp.prompt()
+def code_review(pr_url: str) -> str:
+    """Perform a comprehensive code review on a pull request using GitHub CLI."""
+    return f"""You are helping me perform a thorough code review on a pull request. Follow these steps systematically:
+
+1. **Checkout the PR using GitHub CLI**:
+   - Parse the PR URL to extract repository and PR number
+   - Use `gh pr checkout <pr-number>` to checkout the PR branch locally
+   - If needed, use `gh pr view <pr-number>` to get PR details first
+   - Ensure you're on the correct branch before proceeding
+
+2. **Study the Diff**:
+   - Use `git diff main...HEAD` or `git diff origin/main...HEAD` to see all changes
+   - Use `gh pr diff <pr-number>` to view the PR diff via GitHub CLI
+   - Review all modified, added, and deleted files
+   - Understand the context and purpose of the changes
+   - Note the scope and size of the changes
+
+3. **Perform Comprehensive Code Review** on the following aspects:
+
+   **a) Code Quality & Style**:
+   - Consistency with project coding standards and style guide
+   - Proper naming conventions (variables, functions, classes)
+   - Code readability and clarity
+   - Appropriate use of comments and documentation
+   - Code organization and structure
+
+   **b) Duplicated Code**:
+   - Identify any code duplication within the PR
+   - Check for duplication with existing codebase
+   - Suggest refactoring opportunities to reduce duplication
+   - Look for opportunities to extract common functionality
+
+   **c) Potential Bugs**:
+   - Logic errors and edge cases
+   - Null pointer/null reference issues
+   - Off-by-one errors and boundary conditions
+   - Race conditions and concurrency issues
+   - Memory leaks or resource management problems
+   - Type mismatches and incorrect type handling
+   - Error handling and exception management
+
+   **d) Security Concerns**:
+   - SQL injection vulnerabilities
+   - Cross-site scripting (XSS) risks
+   - Authentication and authorization issues
+   - Sensitive data exposure
+   - Input validation and sanitization
+   - Dependency vulnerabilities
+
+   **e) Performance Issues**:
+   - Inefficient algorithms or data structures
+   - Unnecessary database queries or API calls
+   - Missing caching opportunities
+   - Memory or CPU intensive operations
+   - N+1 query problems
+
+   **f) Testing**:
+   - Adequacy of test coverage
+   - Test quality and maintainability
+   - Missing test cases for edge cases
+   - Test organization and structure
+
+   **g) Architecture & Design**:
+   - Adherence to design patterns and principles
+   - Separation of concerns
+   - Dependency management and coupling
+   - Scalability considerations
+   - Maintainability and extensibility
+
+   **h) Non-obvious Issues**:
+   - Subtle bugs that might not be immediately apparent
+   - Code that might break in edge cases
+   - Assumptions that aren't explicitly documented
+   - Complex logic that might need refactoring
+   - Code that might be difficult to maintain or understand later
+   - Interactions with other parts of the codebase that might be affected
+
+   **i) Documentation**:
+   - Missing or incomplete documentation
+   - Outdated comments or docstrings
+   - README updates if needed
+   - API documentation updates
+
+   **j) Dependencies & Configuration**:
+   - New dependencies and their necessity
+   - Version compatibility issues
+   - Configuration changes and their impact
+   - Environment variable or secret management
+
+4. **Organize Findings**:
+   - Categorize all findings by the aspects above
+   - **Rank order all issues by priority** (critical, high, medium, low)
+   - Critical: Security vulnerabilities, bugs that will cause failures, data loss risks
+   - High: Significant bugs, performance issues, architectural problems
+   - Medium: Code quality issues, maintainability concerns, missing tests
+   - Low: Style issues, minor improvements, documentation gaps
+   - Group related issues together
+   - Note positive aspects and good practices observed
+
+5. **Walk Through Issues with User** (DO NOT OVERWHELM):
+   - **Present issues in rank order from most critical to least critical**
+   - Start with critical issues first, then high priority, then medium, then low
+   - **Do not present all issues at once** - work through them systematically
+   - For each issue, clearly explain:
+     - What the issue is
+     - Where it occurs (file and line numbers)
+     - Why it's a concern
+     - Suggested fix or improvement
+   - **After addressing critical and high priority issues, ask the user** if they want to continue with medium/low priority items
+   - If there are many issues, focus on the most impactful ones first
+   - **Respect user's decision** on each item:
+     - If user agrees it's an issue, note it for the review
+     - If user disagrees or wants to keep it as-is, accept their decision and move on
+     - If user wants more context, provide additional explanation
+     - If user wants to stop or skip lower priority items, respect that
+   - Don't be pushy - the user has final say on what needs to be addressed
+
+6. **Provide Summary**:
+   - After reviewing all categories, provide a summary of:
+     - Total number of issues found (by priority)
+     - Key recommendations
+     - Positive feedback on good practices
+     - Overall assessment of the PR
+
+PR URL: {pr_url}
+
+Focus on being thorough but constructive. The goal is to improve code quality while respecting the author's work and the user's judgment on what needs to be changed."""
+
+
 # Resources
 @mcp.resource("resource://productivity_methods")
 def productivity_methods() -> str:
