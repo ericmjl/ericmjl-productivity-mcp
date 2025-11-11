@@ -445,6 +445,49 @@ def present_issues() -> str:
 The context of where these issues came from is unknown - they could be from code review, static analysis, testing, manual inspection, or any other source. Focus on presenting them clearly and systematically, respecting the user's decisions on each item."""
 
 
+@mcp.prompt()
+def frontend_aesthetics() -> str:
+    """Apply distinctive, creative frontend design principles to avoid generic AI-generated aesthetics."""
+    return """When building frontend interfaces, avoid converging toward generic, "on distribution" outputs that create what users call the "AI slop" aesthetic. Instead, create creative, distinctive frontends that surprise and delight. Apply these principles:
+
+**Typography**:
+- Choose fonts that are beautiful, unique, and interesting
+- Avoid generic fonts like Arial, Inter, and Roboto
+- Opt for distinctive typographic choices that elevate the frontend's aesthetics
+- Vary your font selections across different projects - don't default to common choices like Space Grotesk
+
+**Color & Theme**:
+- Commit to a cohesive aesthetic with CSS variables for consistency
+- Use dominant colors with sharp accents rather than timid, evenly-distributed palettes
+- Draw inspiration from IDE themes and cultural aesthetics
+- Vary between light and dark themes across different projects
+- Avoid clichéd color schemes, particularly purple gradients on white backgrounds
+
+**Motion & Animation**:
+- Use animations for effects and micro-interactions
+- Prioritize CSS-only solutions for HTML
+- Use Motion library for React when available
+- Focus on high-impact moments: one well-orchestrated page load with staggered reveals (using animation-delay) creates more delight than scattered micro-interactions
+
+**Backgrounds & Atmosphere**:
+- Create atmosphere and depth rather than defaulting to solid colors
+- Layer CSS gradients, use geometric patterns, or add contextual effects that match the overall aesthetic
+- Think about how backgrounds contribute to the overall visual narrative
+
+**Avoid Generic Patterns**:
+- Overused font families (Inter, Roboto, Arial, system fonts)
+- Clichéd color schemes (particularly purple gradients on white backgrounds)
+- Predictable layouts and component patterns
+- Cookie-cutter design that lacks context-specific character
+
+**Creative Interpretation**:
+- Interpret creatively and make unexpected choices that feel genuinely designed for the context
+- Think outside the box - avoid converging on common choices across generations
+- Each project should have its own distinctive character and aesthetic identity
+
+Apply these principles to create frontends that feel thoughtfully designed rather than generically generated. Make creative, distinctive choices that surprise and delight users."""
+
+
 # Resources
 @mcp.resource("resource://productivity_methods")
 def productivity_methods() -> str:
