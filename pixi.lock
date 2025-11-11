@@ -1362,7 +1362,7 @@ packages:
 - pypi: ./
   name: ericmjl-productivity-mcp
   version: 0.0.1
-  sha256: a54f630b391284a13850560c841a70f619dae68c2060104b8c60dfabd7d45ee6
+  sha256: b5926589b5cba333c2a87b3e4652335b597c30f7a6ca1c06c9b25af90928f501
   requires_dist:
   - typer
   - fastmcp==2.0.0
