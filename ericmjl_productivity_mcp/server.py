@@ -10,6 +10,31 @@ from fastmcp import FastMCP
 mcp = FastMCP("personal-productivity-mcp")
 
 
+def _get_issue_presentation_instructions() -> str:
+    """Shared instructions for presenting issues to users in rank order."""
+    return """**Walk Through Issues with User** (DO NOT OVERWHELM):
+   - **CRITICAL: Present issues ONE AT A TIME, not in groups**
+   - **Present issues in rank order from most critical to least critical**
+   - Start with the single most critical issue first
+   - **Present only ONE issue at a time** - wait for user's response before presenting the next issue
+   - After presenting one issue, wait for the user to respond before moving to the next
+   - Do NOT present multiple issues together, even if they're the same priority level
+   - For each issue, clearly explain:
+     - What the issue is
+     - Where it occurs (file and line numbers, if applicable)
+     - Why it's a concern
+     - Suggested fix or improvement
+   - **After addressing critical and high priority issues, ask the user** if they want to continue with medium/low priority items
+   - If there are many issues, focus on the most impactful ones first, but still present them one at a time
+   - **Respect user's decision** on each item:
+     - If user agrees it's an issue, note it appropriately
+     - If user disagrees or wants to keep it as-is, accept their decision and move on
+     - If user wants more context, provide additional explanation
+     - If user wants to stop or skip lower priority items, respect that
+   - Don't be pushy - the user has final say on what needs to be addressed
+   - **Remember: ONE issue per interaction, wait for user response, then proceed to the next issue**"""
+
+
 # Prompts
 @mcp.prompt()
 def task_prioritization(task_list: str = "your tasks") -> str:
@@ -281,6 +306,7 @@ The goal is to create a professional, insightful summary that showcases developm
 @mcp.prompt()
 def code_review(pr_url: str) -> str:
     """Perform a comprehensive code review on a pull request using GitHub CLI."""
+    issue_instructions = _get_issue_presentation_instructions()
     return f"""You are helping me perform a thorough code review on a pull request. Follow these steps systematically:
 
 1. **Checkout the PR using GitHub CLI**:
@@ -378,23 +404,8 @@ def code_review(pr_url: str) -> str:
    - Group related issues together
    - Note positive aspects and good practices observed
 
-5. **Walk Through Issues with User** (DO NOT OVERWHELM):
-   - **Present issues in rank order from most critical to least critical**
-   - Start with critical issues first, then high priority, then medium, then low
-   - **Do not present all issues at once** - work through them systematically
-   - For each issue, clearly explain:
-     - What the issue is
-     - Where it occurs (file and line numbers)
-     - Why it's a concern
-     - Suggested fix or improvement
-   - **After addressing critical and high priority issues, ask the user** if they want to continue with medium/low priority items
-   - If there are many issues, focus on the most impactful ones first
-   - **Respect user's decision** on each item:
-     - If user agrees it's an issue, note it for the review
-     - If user disagrees or wants to keep it as-is, accept their decision and move on
-     - If user wants more context, provide additional explanation
-     - If user wants to stop or skip lower priority items, respect that
-   - Don't be pushy - the user has final say on what needs to be addressed
+5. {issue_instructions}
+   - Note: When noting issues for the review, document them appropriately for the PR review
 
 6. **Provide Summary**:
    - After reviewing all categories, provide a summary of:
@@ -406,6 +417,32 @@ def code_review(pr_url: str) -> str:
 PR URL: {pr_url}
 
 Focus on being thorough but constructive. The goal is to improve code quality while respecting the author's work and the user's judgment on what needs to be changed."""
+
+
+@mcp.prompt()
+def present_issues() -> str:
+    """Present a list of issues to the user in rank order, one by one."""
+    issue_instructions = _get_issue_presentation_instructions()
+    return f"""You have a list of issues (from any context - code review, linting, testing, analysis, etc.) that need to be presented to the user. Follow these steps:
+
+1. **Identify and Rank Order Issues**:
+   - Review the list of issues you have (from previous context or analysis)
+   - **Rank order all issues by priority** (critical, high, medium, low):
+     - Critical: Security vulnerabilities, bugs that will cause failures, data loss risks
+     - High: Significant bugs, performance issues, architectural problems
+     - Medium: Code quality issues, maintainability concerns, missing tests
+     - Low: Style issues, minor improvements, documentation gaps
+   - If issues don't have explicit priorities, infer them based on their nature and impact
+
+2. {issue_instructions}
+
+3. **Provide Summary**:
+   - After going through all issues (or when the user stops), provide a summary:
+     - Total number of issues found (by priority)
+     - Number of issues addressed vs. skipped
+     - Key recommendations or next steps
+
+The context of where these issues came from is unknown - they could be from code review, static analysis, testing, manual inspection, or any other source. Focus on presenting them clearly and systematically, respecting the user's decisions on each item."""
 
 
 # Resources
