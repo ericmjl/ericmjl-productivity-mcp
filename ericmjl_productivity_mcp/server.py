@@ -9,6 +9,24 @@ from fastmcp import FastMCP
 mcp = FastMCP("personal-productivity-mcp")
 
 
+def _get_vault_note_rules() -> str:
+    """Shared rules for working with Obsidian vault notes - only link to
+    existing notes."""
+    return """**CRITICAL: Only Link to Existing Notes**:
+   - **ONLY include notes that exist** - Never make up notes or include notes
+     from outside the vault
+   - **Verify existence** - Check the file system to confirm each note exists
+     before including it
+   - **Do NOT create or invent notes** - Only link to notes that ACTUALLY EXIST
+     in the vault
+   - **Do NOT include notes from outside the vault** - Only work with notes
+     within the Obsidian vault
+   - **Use wiki links only** - Always use [[Note Name]] format for all note
+     references
+   - **Double-check before finalizing** - Verify that every wiki link points to
+     a note that exists"""
+
+
 def _get_issue_presentation_instructions() -> str:
     """Shared instructions for presenting issues to users in rank order."""
     return """**Walk Through Issues with User** (DO NOT OVERWHELM):
@@ -553,6 +571,670 @@ surprise and delight. Apply these principles:
 Apply these principles to create frontends that feel thoughtfully designed
 rather than generically generated. Make creative, distinctive choices that
 surprise and delight users."""
+
+
+@mcp.prompt()
+def upgrade_repo_to_template(yolo_mode: bool = False) -> str:
+    """Upgrade a repository to match the standards from the cookiecutter-python-project
+    template at https://github.com/ericmjl/cookiecutter-python-project."""
+    yolo_instruction = (
+        "**YOLO MODE ENABLED**: The user has enabled yolo mode, which means "
+        "you should automatically approve all suggested changes and proceed "
+        "with implementation without asking for individual confirmations. "
+        "Still present the full list of changes for transparency, but proceed "
+        "directly to implementation after listing them."
+        if yolo_mode
+        else (
+            "**APPROVAL REQUIRED**: Present each change individually and wait "
+            "for user approval before proceeding. The user can approve, reject, "
+            "or request modifications for each change."
+        )
+    )
+
+    return f"""You are helping upgrade a repository to match the standards from the
+cookiecutter-python-project template (https://github.com/ericmjl/cookiecutter-python-project).
+Follow these phases systematically:
+
+## Phase 1: Analyze Current Repository Structure
+
+1. **Examine the repository structure**:
+   - List all files in the root directory
+   - Check for existing configuration files
+     (pyproject.toml, .pre-commit-config.yaml, mkdocs.yaml, etc.)
+   - Review the project structure and organization
+   - Identify the package/module structure
+   - Check for existing GitHub Actions workflows
+   - Review existing dependencies and tool configurations
+
+2. **Document current state**:
+   - Note what's already present and what's missing
+   - Identify any custom configurations that should be preserved
+   - Check for project-specific requirements that need to be maintained
+
+## Phase 2: Compare with CookieCutter Template Standards
+
+**CRITICAL FIRST STEP**: Clone or access the cookiecutter-python-project template
+repository to compare files directly:
+
+1. **Clone the template repository**:
+   - Run: `git clone https://github.com/ericmjl/cookiecutter-python-project.git
+     /tmp/cookiecutter-template`
+   - Or access it via GitHub API/web interface if cloning isn't possible
+   - Navigate to the template directory to examine files
+
+2. **Compare files side-by-side**:
+   - For each configuration file in the template, compare it with the current repository
+   - Check for differences in structure, content, and configuration values
+   - Note which files exist in the template but are missing in the current repo
+   - Identify which existing files need updates to match template standards
+
+3. **Examine template structure**:
+   - Review the template's directory structure
+   - Check the template files in the `{{ cookiecutter.__repo_name }}` directory
+   - Note any template variables ({{ cookiecutter.* }}) that need to be replaced
+   - Understand how the template is structured
+
+After accessing the template repository, identify the following key components that
+should be present in the upgraded repository:
+
+**Core Configuration Files:**
+- `pyproject.toml` with sections for:
+  - `[build-system]` (setuptools >=61.0, wheel)
+  - `[tool.interrogate]` (documentation coverage, fail-under: 100)
+  - `[tool.pytest.ini_options]` (test configuration with coverage)
+  - `[tool.ruff]` (line-length: 88, select: ["E", "F", "I"])
+  - `[tool.pydoclint]` (docstring linting)
+  - `[tool.coverage.run]` (coverage configuration)
+  - `[tool.pixi.project]` (channels: conda-forge, platforms)
+  - `[tool.pixi.pypi-dependencies]` (editable package install)
+  - `[tool.pixi.feature.tests.dependencies]` (pytest, pytest-cov, hypothesis)
+  - `[tool.pixi.feature.docs.dependencies]` (mkdocs, mkdocs-material, mknotebooks)
+  - `[tool.pixi.feature.notebook.dependencies]`
+    (ipykernel, ipython, jupyter, pixi-kernel)
+  - `[tool.pixi.feature.devtools.dependencies]` (pre-commit)
+  - `[tool.pixi.feature.tests.tasks]` (test: pytest)
+  - `[tool.pixi.feature.devtools.tasks]`
+    (lint: pre-commit run --all-files, commit: git commit)
+  - `[tool.pixi.feature.docs.tasks]`
+    (build-docs: mkdocs build, serve-docs: mkdocs serve)
+  - `[tool.pixi.feature.setup.tasks]`
+    (setup: pre-commit autoupdate && pre-commit install --install-hooks,
+     update: pre-commit autoupdate)
+  - `[tool.pixi.environments]` (default, docs, tests environments)
+  - `[project]` (name, version, requires-python, dependencies, readme, scripts)
+  - `[project.scripts]` (CLI entry points)
+
+- `.pre-commit-config.yaml` with hooks for:
+  - pre-commit-hooks (check-yaml, end-of-file-fixer, trailing-whitespace)
+  - nbstripout (for Jupyter notebooks)
+  - interrogate (documentation coverage)
+  - pydoclint (docstring linting)
+  - ruff-pre-commit (ruff-check and ruff-format)
+  - local pixi-install hook (to keep lockfile up-to-date)
+
+- `mkdocs.yaml` with:
+  - site_name and site_url configuration
+  - Material theme setup
+  - mknotebooks plugin configuration
+  - Markdown extensions (codehilite, admonition, pymdownx.superfences)
+  - Repository links and social links
+
+- `.gitignore` with Python-specific patterns:
+  - Standard Python ignores (__pycache__, *.pyc, etc.)
+  - Distribution/packaging ignores
+  - Testing/coverage ignores
+  - Environment ignores (.env, .venv, etc.)
+  - Documentation ignores (/site)
+  - Project-specific ignores (.pixi, .llamabot/, etc.)
+
+- `MANIFEST.in` for package distribution
+
+**GitHub Actions Workflows:**
+- `.github/workflows/pr-tests.yaml`:
+  - Runs tests on pull requests using pixi
+  - Includes bare-install test for multiple Python versions
+  - Uploads code coverage to codecov
+
+- `.github/workflows/docs.yaml`:
+  - Builds documentation on push to main
+  - Deploys to GitHub Pages
+
+- `.github/workflows/code-style.yaml`:
+  - Runs pre-commit hooks on pull requests
+
+- `.github/dependabot.yml`:
+  - Weekly updates for GitHub Actions
+
+**Project Structure:**
+- Proper package/module structure
+- Tests directory with pytest configuration
+- Documentation directory (docs/) for mkdocs
+- README.md with project information
+
+## Phase 3: Identify Required Changes
+
+**Use the cloned template repository** to create a comprehensive list of all changes
+needed. For each file in the template:
+
+1. **Read the template file** from the cloned repository
+2. **Compare with the current repository's version** (if it exists)
+3. **Identify specific differences**:
+   - Missing sections or configurations
+   - Outdated values or versions
+   - Structural differences
+   - Missing files entirely
+
+Categorize all changes needed by type:
+
+**A. Files to Add:**
+- List any missing configuration files that need to be created
+- Include GitHub Actions workflows that are missing
+- Note any missing documentation structure
+
+**B. Files to Update:**
+- Identify existing files that need modifications to match template standards
+- Note specific sections that need updating (e.g., pyproject.toml sections)
+- Identify configuration mismatches
+
+**C. Commands to Run:**
+- `pre-commit autoupdate` (to update pre-commit hook versions)
+- `pre-commit install --install-hooks` (to install hooks)
+- `pixi install` (to update pixi.lock after configuration changes)
+- Any other setup commands needed
+
+**D. Project-Specific Adaptations:**
+- Note any project-specific values that need to be preserved:
+  - Package name and module name
+  - CLI entry points
+  - Project-specific dependencies
+  - Custom tasks or configurations
+  - Repository URLs and names
+
+For each change, provide:
+- **What**: Clear description of the change
+- **Why**: Reason it's needed to match template standards
+- **Impact**: What will be affected by this change
+- **Preservation**: Any existing values that should be kept
+
+## Phase 4: Present Changes for Approval
+
+{yolo_instruction}
+
+**Present the complete list of changes** organized by category:
+
+1. **Files to Add** (with brief descriptions)
+2. **Files to Update** (with specific sections/changes)
+3. **Commands to Run** (in order of execution)
+4. **Project-Specific Adaptations** (values to preserve)
+
+For each change, clearly state:
+- The change being made
+- Why it's needed
+- What will be preserved from the current repository
+
+**If NOT in yolo mode:**
+- Present changes ONE AT A TIME or in small logical groups
+- Wait for user approval before proceeding to the next change
+- Allow user to approve, reject, or request modifications
+- Respect user decisions and adapt accordingly
+
+**If in yolo mode:**
+- Present the full list for transparency
+- Proceed directly to implementation after listing
+- Still preserve project-specific values appropriately
+
+## Phase 5: Implement Approved Changes
+
+After receiving approval (or in yolo mode), implement changes systematically using
+the cloned template repository as the source:
+
+1. **Add new files**:
+   - Copy files directly from the cloned template repository
+   - Read the template file content and adapt it for the current project
+   - Replace template variables ({{ cookiecutter.* }}) with actual project values
+   - Preserve any project-specific customizations that exist
+
+2. **Update existing files**:
+   - Merge template configurations with existing ones
+   - Preserve project-specific dependencies and settings
+   - Update only the sections that need to match template standards
+   - Be careful not to overwrite project-specific configurations
+
+3. **Run setup commands**:
+   - Run `pre-commit autoupdate` to update hook versions
+   - Run `pre-commit install --install-hooks` to install hooks
+   - Run `pixi install` to update the lockfile
+   - Verify commands complete successfully
+
+4. **Verify file integrity**:
+   - Check that all files were created/updated correctly
+   - Ensure project-specific values were preserved
+   - Verify configurations are valid (e.g., TOML syntax)
+
+## Phase 6: Verification
+
+After implementation, verify the migration:
+
+1. **Run `pixi shell`**:
+   - This activates the pixi environment and verifies basic setup
+   - Check that the environment activates without errors
+   - Verify that dependencies resolve correctly
+
+2. **Test basic functionality**:
+   - Run `pixi run test` to ensure tests still work
+   - Run `pixi run lint` to verify linting setup
+   - Check that CLI entry points work (if applicable)
+
+3. **Verify configurations**:
+   - Check that pre-commit hooks are installed
+   - Verify GitHub Actions workflows are valid
+   - Ensure documentation builds (if applicable)
+
+4. **Report completion**:
+   - Summarize what was changed
+   - Note any issues encountered
+   - Provide next steps or recommendations
+
+## Important Guidelines
+
+- **Preserve project-specific values**: Always maintain project name,
+  module name, dependencies, and custom configurations
+- **Merge, don't replace**: When updating existing files, merge template
+  standards with existing configurations
+- **Test incrementally**: After major changes, verify the project still works
+- **Document changes**: Note what was changed and why for future reference
+- **Respect user decisions**: If user rejects a change, accept it and move on
+
+The goal is to upgrade the repository to match template standards while
+preserving all project-specific customizations and ensuring everything
+continues to work correctly."""
+
+
+@mcp.prompt()
+def fix_pre_commit_issues() -> str:
+    """Run all pre-commit hooks and fix all issues identified by the hooks."""
+    return """You are helping to run pre-commit hooks and fix all issues they
+identify. Follow these steps systematically:
+
+## Step 1: Run Pre-commit Hooks
+
+1. **Run pre-commit hooks on all files**:
+   - Execute: `pixi run lint` or `pre-commit run --all-files`
+   - If pixi is not available, use: `pre-commit run --all-files` directly
+   - Capture the full output including all errors and warnings
+
+2. **Review the output**:
+   - Identify which hooks ran and which ones failed
+   - Note the specific files and line numbers where issues were found
+   - Categorize issues by type (formatting, linting, documentation, etc.)
+   - Count how many issues were found per hook
+
+## Step 2: Categorize Issues
+
+Organize the issues by hook type:
+
+**Formatting Issues** (ruff-format, black, etc.):
+- Trailing whitespace
+- Line length violations
+- Indentation problems
+- Missing blank lines
+- End-of-file issues
+
+**Linting Issues** (ruff-check, pylint, etc.):
+- Code style violations
+- Unused imports
+- Undefined variables
+- Type checking issues
+- Security concerns
+
+**Documentation Issues** (interrogate, pydoclint, etc.):
+- Missing docstrings
+- Incomplete docstrings
+- Docstring format violations
+- Documentation coverage below threshold
+
+**Other Issues**:
+- YAML/JSON syntax errors
+- Notebook output issues (nbstripout)
+- File permission issues
+- Other hook-specific problems
+
+## Step 3: Fix Issues Systematically
+
+Fix issues one category at a time, starting with the most critical:
+
+1. **Fix formatting issues first**:
+   - Many hooks can auto-fix formatting: run `ruff format .` or let
+     ruff-format hook fix issues automatically
+   - For trailing whitespace: remove it
+   - For line length: break long lines appropriately
+   - For end-of-file: ensure files end with newline
+   - Re-run hooks after fixes to verify
+
+2. **Fix linting issues**:
+   - Address code style violations
+   - Remove unused imports
+   - Fix undefined variables or imports
+   - Address type checking issues if applicable
+   - Some issues can be auto-fixed by ruff-check with --fix flag
+   - For issues that can't be auto-fixed, make manual corrections
+
+3. **Fix documentation issues**:
+   - Add missing docstrings to functions, classes, and modules
+   - Complete incomplete docstrings with proper format
+   - Ensure docstrings follow project conventions (Google, NumPy, etc.)
+   - Update docstrings to match pydoclint requirements
+
+4. **Fix other issues**:
+   - Fix YAML/JSON syntax errors
+   - Clean notebook outputs if needed
+   - Address any other hook-specific issues
+
+## Step 4: Re-run Hooks After Fixes
+
+After fixing issues in each category:
+
+1. **Re-run pre-commit hooks**:
+   - Run `pixi run lint` or `pre-commit run --all-files` again
+   - Verify that the issues you fixed are now resolved
+   - Check if any new issues were introduced by your fixes
+
+2. **Iterate until clean**:
+   - Continue fixing and re-running until all hooks pass
+   - Some fixes may reveal additional issues - address them systematically
+   - Ensure no regressions were introduced
+
+## Step 5: Verify Final State
+
+Once all hooks pass:
+
+1. **Final verification**:
+   - Run `pre-commit run --all-files` one final time
+   - Confirm all hooks pass with exit code 0
+   - Verify no warnings or errors remain
+
+2. **Check for edge cases**:
+   - Ensure auto-fixes didn't break functionality
+   - Verify that code still runs correctly
+   - Check that tests still pass (run `pixi run test` if applicable)
+
+## Important Guidelines
+
+- **Auto-fix when possible**: Many hooks can auto-fix issues. Use `ruff format .`
+  and `ruff check --fix .` to automatically fix formatting and some linting
+  issues before manual fixes.
+
+- **Preserve functionality**: When fixing issues, ensure you don't change the
+  logic or behavior of the code. Only fix style, formatting, and documentation.
+
+- **Follow project conventions**: Maintain consistency with existing code style
+  and documentation format.
+
+- **Fix incrementally**: Fix issues category by category rather than all at
+  once. This makes it easier to verify fixes and catch any problems.
+
+- **Document significant changes**: If you make substantial changes to fix
+  issues, note what was changed and why.
+
+- **Respect hook configurations**: Follow the project's pre-commit configuration.
+  Don't disable hooks or change configurations unless explicitly requested.
+
+The goal is to have all pre-commit hooks pass cleanly while maintaining code
+functionality and following project standards."""
+
+
+@mcp.prompt()
+def create_obsidian_moc(topic: str) -> str:
+    """Create a map of content (MOC) page for a topic in the Obsidian vault's
+    MOCS folder."""
+    vault_rules = _get_vault_note_rules()
+    return f"""You are helping me create a map of content (MOC) page for the
+topic "{topic}" in my Obsidian vault. Follow these steps carefully:
+
+1. **Locate the Obsidian Vault**:
+   - Identify the root directory of the Obsidian vault
+   - Navigate to or create the "MOCs" folder (capital M, capital O, capital C,
+     lowercase s) if it doesn't exist
+   - The folder name must be exactly "MOCs" (not "MOCS", "Mocs", or any other
+     variation)
+
+2. **Scan the Vault for Existing Notes**:
+   - Search through the entire Obsidian vault for notes related to "{topic}"
+   - Look for notes that:
+     - Have titles or content related to the topic
+     - Contain keywords or concepts related to the topic
+     - Are tagged with relevant tags
+   - {vault_rules}
+
+3. **Categorize the Notes**:
+   - Organize the found notes into logical categories
+   - Create meaningful category headings that group related notes together
+   - Examples of categories might be:
+     - Core Concepts
+     - Applications
+     - Related Topics
+     - Resources
+     - Examples
+   - Adapt categories based on the actual notes found and the topic
+
+4. **Create the MOC File**:
+   - Create a new markdown file in the MOCs folder
+   - Name it appropriately for the topic (e.g., "{topic} MOC.md" or
+     "{topic}.md")
+   - The file should contain:
+     - A main heading with the topic name
+     - Categorized headings (using ## for main categories)
+     - Wiki links (using [[Note Name]]) to existing notes under each category
+     - Only include notes that you verified exist in the vault
+
+5. **Format the MOC**:
+   - Use standard Obsidian markdown formatting
+   - Use categorized headings (##) to organize sections
+   - Use wiki link syntax: [[Note Name]] for each note
+   - Ensure proper markdown structure with blank lines between sections
+   - Keep the organization clear and hierarchical
+
+6. **Verify Before Finalizing**:
+   - Double-check that every wiki link points to a note that exists
+   - Confirm the file is saved in the MOCs folder
+   - Ensure no fictional or non-existent notes are included
+   - Verify the categorization makes sense for the topic
+
+7. **Confirm Completion**:
+   - Tell me the path where the MOC was created
+   - List the categories you created
+   - Mention how many notes were included
+   - Note if the MOCs folder needed to be created
+
+**Important Rules**:
+- {vault_rules}
+- **MOCs folder name is exact** - Capital M, capital O, capital C, lowercase s
+- **Use categorized headings** - The MOC should be organized with clear category
+  headings
+
+The goal is to create a useful map of content that helps navigate existing
+notes related to "{topic}" without inventing any content that doesn't exist."""
+
+
+@mcp.prompt()
+def add_note_to_mocs(note_name: str) -> str:
+    """Add a note to the appropriate map(s) of content in the Obsidian vault's
+    MOCs folder, maintaining each MOC's existing style."""
+    vault_rules = _get_vault_note_rules()
+    return f"""You are helping me add the note "{note_name}" to the appropriate
+map(s) of content (MOCs) in my Obsidian vault. Follow these steps carefully:
+
+1. **Locate the Note**:
+   - Find the note "{note_name}" in the Obsidian vault
+   - {vault_rules}
+   - Read the note's content to understand its topic, themes, and subject matter
+   - Identify key concepts, tags, and relationships that might indicate which
+     MOCs it belongs to
+
+2. **Scan the MOCs Folder**:
+   - Navigate to the "MOCs" folder (capital M, capital O, capital C, lowercase s)
+   - List all MOC files in this folder
+   - Read each MOC file to understand:
+     - What topic or theme it covers
+     - Its structure and organization
+     - The style and formatting conventions it uses
+     - The categories it contains
+
+3. **Determine Appropriate MOCs**:
+   - Analyze the note's content against each MOC's topic
+   - Identify which MOC(s) the note logically belongs to based on:
+     - Topic alignment
+     - Conceptual relationships
+     - Thematic connections
+   - The note may belong to multiple MOCs if it spans multiple topics
+   - Use your judgment to determine the best fit(s)
+
+4. **Read Each Relevant MOC's Style**:
+   - For each MOC where the note should be added:
+     - Study the existing structure and formatting
+     - Note the heading hierarchy used (##, ###, etc.)
+     - Observe the category names and organization
+     - Identify any patterns in how notes are listed
+     - Check for any specific formatting conventions (bullet points, numbering, etc.)
+     - Note the order of notes within categories (alphabetical, chronological, etc.)
+
+5. **Determine Appropriate Category**:
+   - For each relevant MOC, identify which category section the note fits into
+   - If no existing category fits, determine if a new category should be created
+     (only if the note truly represents a new theme not covered by existing categories)
+   - Consider the note's relationship to other notes already in that category
+
+6. **Add the Note to Each MOC**:
+   - For each MOC where the note should be added:
+     - Open the MOC file
+     - Find the appropriate category section
+     - Add the note using a wiki link: [[{note_name}]]
+     - Maintain the exact formatting style of that MOC:
+       - Use the same heading levels
+       - Follow the same list format (bullets, numbering, etc.)
+       - Match the indentation and spacing
+       - Preserve the ordering convention (alphabetical, chronological, etc.)
+     - If creating a new category, match the style of existing category
+       headings
+     - Ensure the addition feels natural and consistent with the MOC's
+       existing structure
+
+7. **Verify the Additions**:
+   - Double-check that the note was added to all appropriate MOCs
+   - Verify that the formatting matches each MOC's style
+   - Ensure the note link is correct: [[{note_name}]]
+   - Confirm the note actually exists in the vault
+   - Check that the additions maintain the logical flow of each MOC
+
+8. **Confirm Completion**:
+   - Tell me which MOC(s) the note was added to
+   - List the category(ies) where it was placed
+   - Note if any new categories were created
+   - Mention any style considerations you maintained
+
+**Important Rules**:
+- {vault_rules}
+- **Maintain each MOC's style** - Preserve the exact formatting, structure, and
+  conventions of each MOC you modify
+- **Only add to appropriate MOCs** - Use judgment to determine which MOCs the
+  note truly belongs to, don't add it everywhere
+- **Preserve organization** - Maintain the existing order and structure of each
+  MOC
+- **Match formatting exactly** - Follow the exact style of each MOC, including
+  spacing, indentation, and list formatting
+
+The goal is to seamlessly integrate the note into the appropriate MOC(s) while
+maintaining the unique style and structure of each map of content."""
+
+
+@mcp.prompt()
+def update_obsidian_moc(moc_name: str) -> str:
+    """Update an existing map of content (MOC) in the Obsidian vault's MOCs
+    folder, ensuring it includes all relevant existing notes and maintains its
+    style."""
+    vault_rules = _get_vault_note_rules()
+    return f"""You are helping me update the map of content (MOC) "{moc_name}" in
+my Obsidian vault. Follow these steps carefully:
+
+1. **Locate the MOC**:
+   - Navigate to the "MOCs" folder (capital M, capital O, capital C, lowercase s)
+   - Find the MOC file named "{moc_name}" (or similar variations)
+   - Read the existing MOC to understand:
+     - Its current structure and organization
+     - The style and formatting conventions it uses
+     - The categories it contains
+     - The notes currently linked
+
+2. **Analyze the MOC's Topic**:
+   - Determine what topic or theme the MOC covers
+   - Identify the key concepts and themes associated with this MOC
+   - Understand the scope and purpose of the MOC
+
+3. **Scan the Vault for Relevant Notes**:
+   - Search through the entire Obsidian vault for notes related to the MOC's
+     topic
+   - Look for notes that:
+     - Have titles or content related to the topic
+     - Contain keywords or concepts related to the topic
+     - Are tagged with relevant tags
+     - Are conceptually related to the MOC's theme
+   - {vault_rules}
+
+4. **Verify Existing Links**:
+   - Check each note currently linked in the MOC
+   - Verify that each linked note still exists in the vault
+   - Identify any broken links (notes that no longer exist)
+   - Note which existing links should remain
+
+5. **Categorize Notes**:
+   - Organize all relevant existing notes into logical categories
+   - Match the existing category structure where possible
+   - Determine if new categories are needed for notes that don't fit existing
+     ones
+   - Consider if any existing categories should be removed or merged
+
+6. **Update the MOC**:
+   - Maintain the exact formatting style of the existing MOC:
+     - Use the same heading hierarchy (##, ###, etc.)
+     - Follow the same list format (bullets, numbering, etc.)
+     - Match the indentation and spacing
+     - Preserve the ordering convention (alphabetical, chronological, etc.)
+   - Add wiki links to relevant notes that are missing: [[Note Name]]
+   - Remove links to notes that no longer exist
+   - Reorganize categories if needed while maintaining the MOC's style
+   - Ensure all additions and changes feel natural and consistent with the
+     existing structure
+
+7. **Verify the Updates**:
+   - Double-check that every wiki link points to a note that exists
+   - Confirm no broken links remain
+   - Verify that the formatting matches the MOC's original style
+   - Ensure the organization makes sense for the topic
+   - Check that all relevant existing notes are included
+
+8. **Confirm Completion**:
+   - Tell me what updates were made to the MOC
+   - List any notes that were added
+   - List any notes that were removed (broken links)
+   - Note any categories that were added, removed, or reorganized
+   - Mention how many notes are now linked in the MOC
+   - Confirm that the MOC's style was preserved
+
+**Important Rules**:
+- {vault_rules}
+- **Maintain the MOC's style** - Preserve the exact formatting, structure, and
+  conventions of the existing MOC
+- **Remove broken links** - Delete links to notes that no longer exist
+- **Include all relevant notes** - Ensure the MOC includes all existing notes
+  that relate to its topic
+- **Preserve organization** - Maintain the existing order and structure unless
+  reorganization improves clarity
+- **Match formatting exactly** - Follow the exact style of the MOC, including
+  spacing, indentation, and list formatting
+
+The goal is to keep the MOC up-to-date with all relevant existing notes while
+maintaining its unique style and structure, and removing any links to notes
+that no longer exist."""
 
 
 # Resources
