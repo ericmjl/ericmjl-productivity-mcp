@@ -1237,6 +1237,110 @@ maintaining its unique style and structure, and removing any links to notes
 that no longer exist."""
 
 
+@mcp.prompt()
+def edit_blog_post(blog_post_path: str) -> str:
+    """Edit a blog post to preserve the author's voice while improving clarity
+    and flow."""
+    return f"""You are helping me edit a blog post located at "{blog_post_path}".
+Follow these steps to improve the post while preserving my authentic voice:
+
+1. **Read the Original Post**:
+   - Read the entire blog post carefully
+   - Understand the main message and key points
+   - Note the current structure and flow
+   - Identify the intended audience
+
+2. **Preserve Voice and Tone**:
+   - **Maintain first-person perspective** - Keep "I" statements and personal
+     experiences
+   - **Keep conversational tone** - Don't make it overly formal or academic
+   - **Preserve personal anecdotes** - These add authenticity and engagement
+   - **Maintain friendly, approachable style** - Keep the human connection
+   - **Don't remove personality** - Avoid making it sound generic or "AI-written"
+   - **Keep the author's unique phrasing** - Don't replace distinctive expressions
+     with generic alternatives
+
+3. **Improve Clarity and Flow**:
+   - **Use active voice** - Prefer "I built" over "was built"
+   - **Break up long sentences** - Make complex ideas easier to follow
+   - **Improve transitions** - Add smooth connections between paragraphs and
+     sections
+   - **Clarify ambiguous references** - Make sure pronouns and references are clear
+   - **Strengthen topic sentences** - Ensure each paragraph has a clear focus
+   - **Remove redundancy** - Cut repetitive phrases while keeping key points
+
+4. **Structure and Organization**:
+   - **Maintain clear headings** - Use descriptive section headings (## for main
+     sections)
+   - **Ensure logical flow** - Ideas should build on each other naturally
+   - **Balance section lengths** - Avoid sections that are too short or too long
+   - **Use lists when appropriate** - Break down complex points into bulleted or
+     numbered lists
+   - **Add subheadings if needed** - Break up long sections for readability
+
+5. **Content Refinement**:
+   - **Keep practical, actionable advice** - Preserve concrete examples and
+     real-world applications
+   - **Maintain technical accuracy** - Don't simplify technical concepts incorrectly
+   - **Preserve code examples** - Keep code snippets intact and well-formatted
+   - **Keep personal experiences** - Don't remove stories or examples from actual
+     work
+   - **Enhance examples** - If examples are unclear, clarify them without removing
+     the original context
+
+6. **Writing Quality**:
+   - **Fix grammar and spelling** - Correct errors while preserving natural phrasing
+   - **Improve word choice** - Use clearer, more precise language when needed
+   - **Ensure consistency** - Use consistent terminology throughout
+   - **Check punctuation** - Fix punctuation errors, especially around quotes and
+     code blocks
+   - **Verify markdown formatting** - Ensure proper markdown syntax for headings,
+     lists, code blocks, and links
+
+7. **Ending**:
+   - **Preserve the original conclusion style** - Keep friendly sign-offs or
+     thought-provoking endings
+   - **Ensure the ending ties back to the main message** - Make sure the conclusion
+     reinforces the key points
+   - **Maintain the author's voice** - Don't replace personal endings with generic
+     conclusions
+
+8. **Final Review**:
+   - Read through the edited version
+   - Verify that the author's voice is preserved
+   - Check that improvements enhance rather than replace the original
+   - Ensure the post reads smoothly and naturally
+   - Confirm technical accuracy is maintained
+
+**Important Guidelines**:
+- **Preserve voice above all** - If improving clarity conflicts with preserving
+  voice, choose voice
+- **Don't over-edit** - The goal is refinement, not rewriting
+- **Keep it authentic** - Avoid making it sound like generic AI-generated content
+- **Maintain personal touch** - Preserve anecdotes, opinions, and personal
+  experiences
+- **Improve, don't replace** - Enhance what's there rather than rewriting from
+  scratch
+- **Respect the author's style** - Don't impose a different writing style
+
+**What to Avoid**:
+- Don't remove personal anecdotes or experiences
+- Don't make the tone overly formal or academic
+- Don't replace distinctive phrasing with generic alternatives
+- Don't remove personality or make it sound "corporate"
+- Don't over-explain technical concepts (keep them accessible but accurate)
+- Don't add unnecessary words or fluff
+
+After editing, provide a brief summary of:
+- What voice elements you preserved
+- What clarity improvements you made
+- Any structural changes
+- How the post maintains the author's authentic voice
+
+The goal is to make the blog post read cleanly and fluently while preserving my
+tone, voice, and personal style."""
+
+
 # Resources
 @mcp.resource("resource://productivity_methods")
 def productivity_methods() -> str:
