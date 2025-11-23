@@ -113,33 +113,48 @@ is lost and context is preserved for seamless continuation."""
 
 @mcp.prompt()
 def remember() -> str:
-    """Capture learnings and instructions from conversation to AGENTS.md."""
-    return """You are tasked with capturing important learnings and instructions from our conversation and adding them to AGENTS.md. Follow these steps:
+    """Add new content to AGENTS.md, then clean up the file for coherence."""
+    return """You are tasked with adding new content to AGENTS.md and then cleaning it up to ensure coherence. Follow these steps:
 
-1. **Review the conversation**: Look through our recent conversation for:
-   - User preferences and workflow patterns
-   - Important decisions or configurations
-   - Code patterns or implementation details
-   - Project structure insights
-   - Testing approaches or dependencies
+1. **Wait for user content**: Do NOT review the conversation. Instead, wait for the user to provide the new content they want to add to AGENTS.md. The user will tell you what they want to remember.
 
-2. **Categorize the content** using these sections:
-   - **User Preferences**: Preferences, likes/dislikes, workflow habits
-   - **Project Structure**: File organization, directory structure, architecture decisions
-   - **Code Patterns**: Implementation patterns, coding style, best practices
-   - **Dependencies**: Package requirements, external tools, integrations
-   - **Testing**: Testing strategies, frameworks, approaches
-   - **Development Workflow**: General development processes, git workflows, deployment
-
-3. **Update AGENTS.md**:
+2. **Add new content**: Once the user provides the content:
    - Read the existing AGENTS.md file (create it if it doesn't exist)
-   - Add a timestamped entry to the appropriate section
-   - Use this format: `- Description of what was learned`
+   - Categorize the new content into appropriate sections:
+     - **User Preferences**: Preferences, likes/dislikes, workflow habits
+     - **Project Structure**: File organization, directory structure, architecture decisions
+     - **Code Patterns**: Implementation patterns, coding style, best practices
+     - **Dependencies**: Package requirements, external tools, integrations
+     - **Testing**: Testing strategies, frameworks, approaches
+     - **Development Workflow**: General development processes, git workflows, deployment
+   - Add the new content to the appropriate section(s) using clean bullet points
+   - **DO NOT add timestamps** - use simple format: `- Description of what to remember`
    - If a section doesn't exist, create it with a proper markdown header
 
-4. **Confirm what you remembered**: Tell me what you added to AGENTS.md and which section you placed it in.
+3. **Read and analyze entire AGENTS.md**:
+   - Read the complete AGENTS.md file from start to finish
+   - Understand the current structure and all existing content
+   - Identify any contradictions between the new content you just added and existing content
 
-Focus on capturing actionable insights that will help future AI agents understand the project context and user preferences."""  # noqa: E501
+4. **Clean up and reorganize**:
+   - Remove all contradictions - if new content conflicts with existing content, keep the new content and remove or update the conflicting old content
+   - Remove all timestamps from the document (format: `[YYYY-MM-DD HH:MM]`)
+   - Reorganize sections for logical flow and coherence
+   - Merge duplicate or similar entries
+   - Ensure the document is well-structured and easy to navigate
+   - Make sure related content is grouped together logically
+   - Ensure the document reads as a coherent reference guide, not a chronological log
+
+5. **Present for verification**:
+   - Show the user the cleaned-up AGENTS.md file
+   - Ask them: "Does this look correct? Does it accurately reflect what you want to remember?"
+   - Wait for their confirmation before finalizing
+
+6. **Finalize**:
+   - Once the user confirms it looks correct, save the cleaned-up version
+   - The final AGENTS.md should be a coherent, timeless reference document that future AI agents can easily follow
+
+The goal is to maintain AGENTS.md as a coherent, well-organized reference document rather than a chronological log with timestamps."""  # noqa: E501
 
 
 @mcp.prompt()
