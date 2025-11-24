@@ -520,6 +520,225 @@ what needs to be changed."""
 
 
 @mcp.prompt()
+def pre_commit_review() -> str:
+    """Review staged code changes from a principal/staff engineer perspective
+    before committing."""
+    return """You are reviewing code changes as a principal or staff engineer
+before they are committed. This is a critical review focused on ensuring
+production-ready code quality, maintainability, and long-term project health.
+Follow these steps systematically:
+
+1. **Examine the Changes**:
+   - Use `git diff --cached` or `git diff HEAD` to see all staged/unstaged changes
+   - Review all modified, added, and deleted files
+   - Understand the context and purpose of the changes
+   - Check if this is part of a larger feature or a standalone change
+   - Review the commit message (if provided) for clarity and accuracy
+
+2. **Test Quality & Coverage** (CRITICAL):
+   - **Tests that don't test what they should**:
+     - Are tests actually verifying the intended behavior, or just checking
+       that code runs without error?
+     - Do tests assert meaningful outcomes, not just that functions execute?
+     - Are edge cases and error conditions properly tested?
+     - Do tests verify both positive and negative cases?
+     - Are integration tests present where unit tests alone aren't sufficient?
+   - **Test organization and maintainability**:
+     - Are tests well-organized and easy to understand?
+     - Do test names clearly describe what they're testing?
+     - Is test setup/teardown appropriate and not overly complex?
+     - Are tests independent and can run in any order?
+     - Do tests avoid testing implementation details unnecessarily?
+   - **Missing test coverage**:
+     - Are all new functions, classes, and modules covered by tests?
+     - Are error paths and exception handlers tested?
+     - Are boundary conditions and edge cases tested?
+     - Are integration points tested appropriately?
+   - **Test quality issues**:
+     - Are there flaky tests that might fail intermittently?
+     - Do tests have proper assertions with meaningful error messages?
+     - Are mocks/stubs used appropriately and not overused?
+     - Do tests run efficiently and not take excessive time?
+
+3. **Documentation Review** (CRITICAL):
+   - **Missing documentation**:
+     - Do all public APIs have docstrings/comments explaining their purpose?
+     - Are complex algorithms or business logic explained?
+     - Are non-obvious design decisions documented?
+     - Is README updated if user-facing behavior changed?
+     - Are API documentation files updated if applicable?
+     - Are configuration options documented?
+   - **Incorrect documentation**:
+     - Do docstrings match the actual function signatures and behavior?
+     - Are examples in documentation correct and runnable?
+     - Are parameter descriptions accurate?
+     - Are return value descriptions correct?
+     - Is the documentation consistent with the code implementation?
+     - Are deprecated features properly marked and migration paths documented?
+   - **Documentation quality**:
+     - Is documentation clear and understandable for new team members?
+     - Are there examples where they would be helpful?
+     - Is the documentation maintainable and likely to stay in sync with code?
+
+4. **Architecture & Design**:
+   - **Design patterns and principles**:
+     - Is the code following established patterns consistently?
+     - Are SOLID principles being followed appropriately?
+     - Is there proper separation of concerns?
+     - Are abstractions at the right level (not over/under-abstracted)?
+   - **Coupling and cohesion**:
+     - Are modules appropriately decoupled?
+     - Is there unnecessary coupling between components?
+     - Do changes introduce tight coupling that will be hard to maintain?
+   - **Scalability and performance**:
+     - Will this code scale appropriately as usage grows?
+     - Are there obvious performance bottlenecks?
+     - Are database queries optimized (no N+1 problems)?
+     - Is caching used appropriately where beneficial?
+   - **Breaking changes**:
+     - Does this change break existing APIs or contracts?
+     - If breaking changes are necessary, are they properly versioned?
+     - Are migration paths provided for breaking changes?
+     - Are deprecation warnings added before removal?
+
+5. **Error Handling & Resilience**:
+   - **Error handling completeness**:
+     - Are all error cases handled appropriately?
+     - Are exceptions caught at the right level?
+     - Are error messages helpful for debugging?
+     - Are errors logged appropriately for observability?
+   - **Edge cases and boundary conditions**:
+     - Are null/None values handled correctly?
+     - Are empty collections handled appropriately?
+     - Are boundary values (0, -1, max values) handled?
+     - Are race conditions considered in concurrent code?
+   - **Resource management**:
+     - Are resources (files, connections, memory) properly cleaned up?
+     - Are there potential memory leaks?
+     - Is exception safety ensured (resources cleaned up even on exceptions)?
+
+6. **Security Considerations**:
+   - **Input validation**:
+     - Is all user input validated and sanitized?
+     - Are SQL injection, XSS, and other injection attacks prevented?
+     - Are file uploads validated and restricted appropriately?
+   - **Authentication and authorization**:
+     - Are authentication checks in place where needed?
+     - Is authorization verified at appropriate boundaries?
+     - Are permissions checked correctly?
+   - **Sensitive data**:
+     - Are secrets, passwords, or tokens handled securely?
+     - Is sensitive data logged inadvertently?
+     - Are API keys or credentials exposed in code or logs?
+   - **Dependencies**:
+     - Are dependencies up-to-date with known vulnerabilities?
+     - Are new dependencies necessary and from trusted sources?
+
+7. **Code Quality & Maintainability**:
+   - **Code smells**:
+     - Are there long methods or classes that should be refactored?
+     - Is there code duplication that should be extracted?
+     - Are there magic numbers that should be constants?
+     - Is there dead code that should be removed?
+   - **Readability**:
+     - Is the code self-documenting with clear naming?
+     - Are complex expressions broken down for clarity?
+     - Is the code structure easy to follow?
+   - **Consistency**:
+     - Does this code follow project conventions and style guides?
+     - Is naming consistent with the rest of the codebase?
+     - Are patterns used consistently across the codebase?
+
+8. **Observability & Debugging**:
+   - **Logging**:
+     - Are important events logged at appropriate levels?
+     - Are log messages helpful for debugging production issues?
+     - Is sensitive information excluded from logs?
+     - Are structured logs used where appropriate?
+   - **Metrics and monitoring**:
+     - Are key metrics exposed for monitoring?
+     - Are performance-critical paths instrumented?
+     - Are error rates trackable?
+
+9. **Configuration & Environment**:
+   - **Configuration management**:
+     - Are configuration values properly externalized?
+     - Are environment-specific configs handled correctly?
+     - Are default values sensible and documented?
+   - **Environment variables**:
+     - Are required environment variables documented?
+     - Are defaults provided where appropriate?
+     - Is validation of configuration values performed?
+
+10. **Dependencies & Versioning**:
+    - **Dependency management**:
+      - Are new dependencies truly necessary?
+      - Are dependency versions pinned appropriately?
+      - Are dependency licenses compatible with project license?
+    - **Version compatibility**:
+      - Will this work with the supported versions of dependencies?
+      - Are there breaking changes in dependencies that need addressing?
+
+11. **Integration & Compatibility**:
+    - **Backward compatibility**:
+      - Are existing integrations preserved?
+      - Will this break existing clients or consumers?
+    - **API contracts**:
+      - Are API contracts maintained or properly versioned?
+      - Are response formats consistent?
+
+12. **Performance & Resource Usage**:
+    - **Efficiency**:
+      - Are algorithms and data structures optimal for the use case?
+      - Are there unnecessary computations or database queries?
+      - Is lazy loading used where appropriate?
+    - **Resource constraints**:
+      - Will this code work within resource limits (memory, CPU, disk)?
+      - Are there potential resource exhaustion scenarios?
+
+13. **Accessibility & Usability** (if applicable):
+    - **Accessibility**:
+      - Are accessibility standards followed (WCAG, ARIA attributes)?
+      - Is keyboard navigation supported?
+      - Are screen readers considered?
+    - **User experience**:
+      - Are error messages user-friendly?
+      - Is feedback provided for long-running operations?
+
+14. **Technical Debt**:
+    - **Debt introduction**:
+      - Does this code introduce technical debt?
+      - Are there TODOs or FIXMEs that should be addressed?
+      - Are shortcuts taken that will cause problems later?
+    - **Debt reduction**:
+      - Does this change reduce existing technical debt?
+      - Are deprecated patterns being replaced?
+
+15. **Final Assessment**:
+    - **Critical blockers**:
+      - Are there any issues that MUST be fixed before committing?
+      - Security vulnerabilities, data loss risks, breaking changes without
+        migration paths
+    - **Important improvements**:
+      - Issues that should be addressed but aren't blockers
+      - Missing tests, incorrect documentation, performance concerns
+    - **Nice-to-have improvements**:
+      - Minor code quality improvements, style issues, documentation polish
+
+**Review Output Format**:
+- Categorize findings by the sections above
+- Rank all issues by priority (critical, high, medium, low)
+- Provide specific, actionable feedback with code examples where helpful
+- Note positive aspects and good practices observed
+- Provide a summary with total issues by priority
+- Clearly indicate what MUST be fixed vs. what SHOULD be improved
+
+Focus on being thorough, constructive, and focused on long-term code health.
+The goal is to catch issues before they reach production and ensure the codebase
+remains maintainable and high-quality. Be direct but respectful in your feedback."""
+
+
+@mcp.prompt()
 def present_issues() -> str:
     """Present a list of issues to the user in rank order, one by one."""
     issue_instructions = _get_issue_presentation_instructions()
