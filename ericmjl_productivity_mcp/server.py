@@ -299,18 +299,36 @@ Follow these steps to systematically analyze and resolve the issue:
       timeout issues, resource constraints
    - Examine the workflow configuration and environment setup
 
-4. **Provide debugging guidance**:
+4. **Reproduce the issue locally**:
+   - Checkout the same commit/branch that triggered the failed workflow:
+     `git checkout <commit-sha>` or `git checkout <branch-name>`
+   - Review the workflow file (`.github/workflows/*.yaml`) to identify the exact
+     commands and environment setup used in CI
+   - Run the same commands locally that the workflow executes:
+     - Install the same dependencies (e.g., `pixi install`, `npm install`,
+       `pip install`)
+     - Use the same environment versions (Python, Node.js, etc.) if specified
+     - Execute the same test/build commands (e.g., `pixi run test`, `npm test`)
+   - For more accurate reproduction, consider using `act` (GitHub Actions locally):
+     - Install act: `brew install act` (macOS) or follow platform-specific instructions
+     - Run the workflow locally: `act -j <job-name>` or `act` to run all jobs
+     - Note: act may have limitations with certain actions or secrets
+   - Compare local results with CI results to identify environment-specific issues
+   - Document any differences between local and CI environments that might affect
+     the failure
+
+5. **Provide debugging guidance**:
    - Explain what went wrong in simple terms
    - Suggest specific fixes or configuration changes
    - Provide commands or code snippets to resolve the issue
    - Recommend preventive measures to avoid similar failures
 
-5. **Context-aware solutions**:
+6. **Context-aware solutions**:
    - Consider the project type (Python, Node.js, etc.) and suggest appropriate fixes
    - Check for recent changes that might have caused the failure
    - Suggest workflow improvements or optimizations
 
-6. **Follow-up actions**:
+7. **Follow-up actions**:
    - Recommend next steps for testing the fix
    - Suggest monitoring or alerting improvements
    - Provide guidance on preventing similar issues
